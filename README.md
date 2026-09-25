@@ -110,6 +110,16 @@ TELOMERECAT_BUILD_HTS_SCREENING=1 python setup.py build_ext --inplace
 
 The HTS-specific tests are skipped when the optional backend is absent.
 
+#### Mismatch comparison acceleration
+
+An optional CPython extension also accelerates the mismatch comparisons used
+when calculating read statistics. It preserves the mismatch count, quality-based
+tie breaking and first-offset choice on exact ties. This extension uses only
+the public CPython API and builds alongside the portable screening extension;
+it does not require pysam headers or Cython. If compilation is unavailable,
+the original Python implementation remains available. Subclass/custom comparison
+hooks and unusual input types also retain Python behavior.
+
 You will need virtualenv available on your system.
 
 ### Create a virtual python environement

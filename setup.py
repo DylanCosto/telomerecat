@@ -4,7 +4,10 @@ from setuptools import Extension, setup
 import os
 import sys
 
-extensions = [Extension("telomerecat._screening", ["telomerecat/_screening.c"], optional=True)]
+extensions = [
+  Extension("telomerecat._screening", ["telomerecat/_screening.c"], optional=True),
+  Extension("telomerecat._mismatch", ["telomerecat/_mismatch.c"], optional=True),
+]
 # Opt in because this backend is compiled against the installed pysam headers.
 # The default build keeps the portable public-API accelerator.
 if os.environ.get('TELOMERECAT_BUILD_HTS_SCREENING') == '1':
