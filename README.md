@@ -82,3 +82,7 @@ CircleCI will handle docker image push to quay.io and package deployment to pypi
 
 <!-- Quay.io -->
 [quay-tags]: https://quay.io/repository/wtsicgp/telomerecat?tab=tags
+
+### Optional native acceleration
+
+Installation can build a small C extension for paired-read screening. It needs a C compiler and Python development headers; Cython and pysam headers are not required. If it cannot be built or imported, Telomerecat uses the existing Python implementation.
