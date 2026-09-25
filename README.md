@@ -79,8 +79,36 @@ python -m unittest discover -s tests -v
 To check which implementation is available:
 
 ```sh
-python -c 'from telomerecat import telbam; print("native" if telbam._native_pairs_to_telbam is not None else "python")'
+python -c 'from telomerecat import telbam; print("hts" if telbam._hts_pairs_to_telbam is not None else "native" if telbam._native_pairs_to_telbam is not None else "python")'
 ```
+
+#### Optional direct BAM screening on Linux
+
+An additional backend reuses two HTSlib alignment records while screening the
+paired stream. This avoids constructing Python alignment and sequence objects
+for every read. Pairing, motifs, read selection, and output order are unchanged.
+The public-interface extension remains the default build.
+
+To opt in from a source checkout, install pysam with its bundled HTSlib and
+Cython in the build environment, then build against that installed version:
+
+```sh
+python -m pip install pysam 'Cython>=3,<4' setuptools wheel
+TELOMERECAT_BUILD_HTS_SCREENING=1 python -m pip install --no-build-isolation .
+```
+
+This backend uses pysam's compiled interfaces. Rebuild it after changing the
+pysam version; a version mismatch falls back to the public-interface extension
+or Python. Custom motif patterns and alignment-file subclasses also use the
+existing path. The tested configuration is Linux, Python 3.10, and pysam 0.24.1.
+
+For development, build in place and run the tests above:
+
+```sh
+TELOMERECAT_BUILD_HTS_SCREENING=1 python setup.py build_ext --inplace
+```
+
+The HTS-specific tests are skipped when the optional backend is absent.
 
 You will need virtualenv available on your system.
 

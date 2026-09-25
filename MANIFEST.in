@@ -1,0 +1,3 @@
+include telomerecat/_screening_hts.pyx
+include tests/test_*.py
+exclude telomerecat/_screening_hts.c
