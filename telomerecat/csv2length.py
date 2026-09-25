@@ -61,9 +61,28 @@ class LengthSimulator(object):
 
     read_simulator = self._read_sim
     get_factor = self.__get_factor__
+    # Seeded simulations restart the RNG for each candidate length. Repeated
+    # candidates therefore produce identical counts, even when the search
+    # oscillates until max_its. Keep the RNG state as well as the counts so
+    # reusing a result has exactly the same effect as simulating it again.
+    # Bound the cache: a random state is appreciably larger than the counts.
+    seeded_results = {}
 
     while not found and its < max_its:
-      sim_comp, sim_boun, invalid_reads = read_simulator(tel_len)
+      cacheable = (self.seed_randomness and tel_len >= self._insert_mu
+                   and type(self) is LengthSimulator
+                   and getattr(read_simulator, '__func__', None)
+                   is LengthSimulator.__simulate_reads__)
+      if cacheable and tel_len in seeded_results:
+        counts, rng_state = seeded_results[tel_len]
+        random.setstate(rng_state)
+      else:
+        counts = read_simulator(tel_len)
+        if cacheable:
+          if len(seeded_results) == 128:
+            del seeded_results[next(iter(seeded_results))]
+          seeded_results[tel_len] = (counts, random.getstate())
+      sim_comp, sim_boun, invalid_reads = counts
       #   result can be positive or negative thus
       #   influencing elongation and shortening
       #   A negative diference (overestimate) results
