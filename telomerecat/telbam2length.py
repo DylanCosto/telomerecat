@@ -26,6 +26,11 @@ from functools import partial
 
 from . import RANDOM_SEED
 
+try:
+  from ._mismatch import compare_to_telo as _native_compare_to_telo
+except ImportError:
+  _native_compare_to_telo = None
+
 class SimpleReadFactory(object):
   def __init__(self, vital_stats=None, trim_reads=0):
     self._SimpleRead = namedtuple(
@@ -262,6 +267,16 @@ class MismatchingLociLogic(object):
     return filtered_fuse
 
   def compare_to_telo(self, seq, qual, pattern):
+    if (_native_compare_to_telo is not None
+        and type(self) is MismatchingLociLogic
+        and getattr(self.telo_sequence_generator, '__func__', None) is _original_telo_generator
+        and getattr(self.get_best_offset, '__func__', None) is _original_best_offset):
+      result = _native_compare_to_telo(seq, qual, pattern)
+      if result is not NotImplemented:
+        return result
+    return self._compare_to_telo_python(seq, qual, pattern)
+
+  def _compare_to_telo_python(self, seq, qual, pattern):
     comparisons = []
     best_score = float("inf")
 
@@ -397,6 +412,10 @@ class MismatchingLociLogic(object):
       loci_status[start:end] = ["F"] * (end - start)
 
     return "".join(loci_status), mima_loci, fuse_loci
+
+
+_original_telo_generator = MismatchingLociLogic.telo_sequence_generator
+_original_best_offset = MismatchingLociLogic.get_best_offset
 
 
 class VitalStatsFinder(object):
