@@ -61,6 +61,27 @@ When selecting the number of processes/threads the following should be considere
 
 ## Development Dependencies
 
+### Screening acceleration
+
+Installation builds a small optional C extension for the paired-read screening
+loop when a C compiler and Python development headers are available. It uses
+pysam's public Python interface and needs no pysam/HTSlib headers or Cython.
+If the extension cannot be built or imported, screening uses the existing
+Python implementation. Read selection and output order are the same.
+
+For a source checkout, build and test it with:
+
+```sh
+python setup.py build_ext --inplace
+python -m unittest discover -s tests -v
+```
+
+To check which implementation is available:
+
+```sh
+python -c 'from telomerecat import telbam; print("native" if telbam._native_pairs_to_telbam is not None else "python")'
+```
+
 You will need virtualenv available on your system.
 
 ### Create a virtual python environement

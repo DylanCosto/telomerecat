@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from setuptools import setup
+from setuptools import Extension, setup
 
 setup(
   name="telomerecat",
@@ -14,6 +14,7 @@ setup(
   python_requires='>= 3.7',
   author_email="cgphelp@sanger.ac.uk",
   packages=["telomerecat"],
+  ext_modules=[Extension("telomerecat._screening", ["telomerecat/_screening.c"], optional=True)],
   package_dir={"telomerecat": "telomerecat"},
   install_requires=["parabam>=3.0.1", "numpy", "pysam", "pandas", "click"],
   include_package_data=True,
