@@ -11,6 +11,11 @@ from functools import partial
 from telomerecat.constants import TEL_PATS, HTS_EXT_TO_AF_MODE
 from pysam import AlignmentFile
 
+try:
+    from telomerecat._screening_hts import pairs_to_telbam as _hts_pairs_to_telbam
+except (ImportError, ValueError):
+    _hts_pairs_to_telbam = None
+
 def _log_setup(loglevel):
     logging.basicConfig(level=getattr(logging, loglevel.upper()), format='%(levelname)s: %(message)s')
 
@@ -56,6 +61,14 @@ def collate_pairs(xam_file: str, tmpdir:str, processes=1, reference=None):
 
 
 def pairs_to_telbam(af_pairs:AlignmentFile, af_telbam:AlignmentFile):
+    if (_hts_pairs_to_telbam is not None
+            and type(af_pairs) is AlignmentFile and type(af_telbam) is AlignmentFile
+            and tuple(TEL_PATS) == ('TTAGGGTTAGGG', 'CCCTAACCCTAA')):
+        return _hts_pairs_to_telbam(af_pairs, af_telbam)
+    return _pairs_to_telbam_python(af_pairs, af_telbam)
+
+
+def _pairs_to_telbam_python(af_pairs:AlignmentFile, af_telbam:AlignmentFile):
     read_iter = af_pairs.fetch(until_eof=True)
     while True:
         read_a = next(read_iter, None)
