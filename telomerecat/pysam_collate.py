@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import stat
 import pkg_resources
 import pysam
 import click
@@ -15,8 +16,11 @@ def thin_wrap(output, threads, reference, tmpdir, in_bam_cram):
     """Simple wrapper around pysam.collate to avoid requiring system installed samtools"""
 
     prefix = os.path.join(tmpdir, 'collate')
-    # although this is intended to be used via a named pipe this will reduce the chance of it being filled
     collate_opts = ['--no-PG', '-r', '2500000', '-f', '--output-fmt', 'BAM', '-l', '1']
+    # Avoid compressing the stream only to decompress it in the next process.
+    # Preserve the existing compression setting for regular file outputs.
+    if os.path.exists(output) and stat.S_ISFIFO(os.stat(output).st_mode):
+        collate_opts.append('-u')
     collate_opts.extend(['-o', output])
     collate_opts.extend(['-@', str(threads)])
     if reference:
@@ -25,5 +29,4 @@ def thin_wrap(output, threads, reference, tmpdir, in_bam_cram):
     collate_opts.append(prefix)
 
     pysam.collate(*collate_opts)
-
 
