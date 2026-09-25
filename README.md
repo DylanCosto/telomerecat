@@ -82,3 +82,14 @@ CircleCI will handle docker image push to quay.io and package deployment to pypi
 
 <!-- Quay.io -->
 [quay-tags]: https://quay.io/repository/wtsicgp/telomerecat?tab=tags
+
+### Optional direct BAM screening (Linux)
+
+This backend screens packed BAM sequences without creating Python objects for every read. It requires a C compiler, Python development headers, Cython, and pysam with bundled HTSlib. Build it against the installed pysam version:
+
+```sh
+python -m pip install pysam 'Cython>=3,<4' setuptools wheel
+TELOMERECAT_BUILD_HTS_SCREENING=1 python -m pip install --no-build-isolation .
+```
+
+Rebuild after changing pysam versions. If the extension is missing or its version check fails, screening falls back to Python. Custom motifs and AlignmentFile subclasses also use the Python path. Validated on Linux with Python 3.10 and pysam 0.24.1.
