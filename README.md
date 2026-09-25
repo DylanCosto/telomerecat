@@ -69,11 +69,10 @@ pysam's public Python interface and needs no pysam/HTSlib headers or Cython.
 If the extension cannot be built or imported, screening uses the existing
 Python implementation. Read selection and output order are the same.
 
-For a source checkout, build and test it with:
+For a source checkout, build it with:
 
 ```sh
 python setup.py build_ext --inplace
-python -m unittest discover -s tests -v
 ```
 
 To check which implementation is available:
@@ -102,13 +101,11 @@ pysam version; a version mismatch falls back to the public-interface extension
 or Python. Custom motif patterns and alignment-file subclasses also use the
 existing path. The tested configuration is Linux, Python 3.10, and pysam 0.24.1.
 
-For development, build in place and run the tests above:
+For development, build in place:
 
 ```sh
 TELOMERECAT_BUILD_HTS_SCREENING=1 python setup.py build_ext --inplace
 ```
-
-The HTS-specific tests are skipped when the optional backend is absent.
 
 #### Mismatch comparison acceleration
 
