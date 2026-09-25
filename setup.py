@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from setuptools import setup
+from setuptools import Extension, setup
 
 setup(
   name="telomerecat",
@@ -13,6 +13,7 @@ setup(
   license="GPL",
   python_requires='>= 3.7',
   author_email="cgphelp@sanger.ac.uk",
+  ext_modules=[Extension("telomerecat._mismatch", ["telomerecat/_mismatch.c"], optional=True)],
   packages=["telomerecat"],
   package_dir={"telomerecat": "telomerecat"},
   install_requires=["parabam>=3.0.1", "numpy", "pysam", "pandas", "click"],
